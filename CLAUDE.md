@@ -7,7 +7,8 @@ Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with 
 ## Current status
 
 - **Phase 1 (The Application): complete** — FastAPI app, 9 passing pytest tests, Docker image, all built test-first.
-- **Next: Phase 2 (Kubernetes manifests)** — Kind cluster, namespace/configmap/deployment/service, setup + teardown scripts.
+- **Phase 2 (Kubernetes manifests): complete** — namespace/configmap/deployment/service, idempotent `scripts/setup-cluster.sh` + `teardown.sh`. Verified: 2 replicas Running, API reachable via port-forward, clean setup→deploy→teardown.
+- **Next: Phase 3 (API test suite)** — pytest against the deployed app (health, CRUD, resilience via K8s client).
 
 ## Layout
 
@@ -36,4 +37,6 @@ docker build -t k8s-qa-demo:local ./app        # build image
 ## Gotchas
 
 - **Windows/Git Bash: backgrounding a server with `&` then `kill $PID` is unreliable.** A stale `uvicorn` once kept squatting on port 8000, so tests silently hit the old process instead of the container. Prefer running servers in their own terminal (`Ctrl+C` to stop) or use Docker `-p` + `docker rm -f`. If results look wrong, check `netstat -ano | grep :8000` and `taskkill //PID <pid> //F`.
+- **Kind + cgroup v1:** Docker Desktop on this WSL2 host exposes cgroup **v1**, but recent Kind default node images ship a kubelet that refuses it (kubelet crash-loops → API server never starts → "connection refused" at cluster bootstrap). `setup-cluster.sh` pins `kindest/node:v1.29.14` (K8s 1.29 tolerates cgroup v1). Don't drop the `--image` pin without checking `docker info | grep Cgroup`.
+- **`kubectl apply -f k8s/` applies files alphabetically**, so namespaced resources (configmap, deployment) would be applied before `namespace.yaml`. The setup script applies `namespace.yaml` first, then the whole dir.
 - No git remote is configured yet — needed before Phase 4 (CI).

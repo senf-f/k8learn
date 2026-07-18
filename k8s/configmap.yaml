@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qa-demo-config
+  namespace: qa-demo
+  labels:
+    app: qa-demo
+data:
+  APP_NAME: k8s-qa-demo
+  LOG_LEVEL: info
