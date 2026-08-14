@@ -41,7 +41,16 @@ jobs:
         run: pip install -r app/requirements.txt -r tests/requirements.txt
 
       - name: Run tests
-        run: python -m pytest tests/ -v
+        run: python -m pytest tests/ -v --html=report.html --self-contained-html
+
+      # Upload the HTML report even when tests fail — that's when it's most
+      # useful. `if: always()` runs regardless of the previous step's outcome.
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: report.html
 
       - name: Dump diagnostics on failure
         if: failure()
