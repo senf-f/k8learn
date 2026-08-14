@@ -1,0 +1,54 @@
+name: k8s-tests
+
+# Build the image, spin up a Kind cluster, deploy, and run the full pytest
+# suite (unit + integration) against the deployed app on every push/PR to main.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  k8s-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.32.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          kind version
+
+      # Docker and kubectl are preinstalled on ubuntu-latest runners.
+      # setup-cluster.sh is the single source of truth for cluster bring-up:
+      # it builds the image, creates the Kind cluster, loads the image, applies
+      # the manifests, and waits for the rollout. The node-image pin exists for
+      # a local cgroup v1 host; it also runs fine on the runner's cgroup v2.
+      - name: Create cluster and deploy
+        run: bash scripts/setup-cluster.sh
+
+      - name: Install test dependencies
+        run: pip install -r app/requirements.txt -r tests/requirements.txt
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        run: |
+          echo "==> Pods"
+          kubectl get pods -n qa-demo -o wide || true
+          echo "==> Deployment"
+          kubectl describe deployment qa-demo -n qa-demo || true
+          echo "==> Pod logs"
+          kubectl logs -n qa-demo -l app=qa-demo --all-containers --tail=200 || true
+          echo "==> Events"
+          kubectl get events -n qa-demo --sort-by=.lastTimestamp || true

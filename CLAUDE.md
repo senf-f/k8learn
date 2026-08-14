@@ -9,7 +9,8 @@ Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with 
 - **Phase 1 (The Application): complete** — FastAPI app, 9 passing pytest tests, Docker image, all built test-first.
 - **Phase 2 (Kubernetes manifests): complete** — namespace/configmap/deployment/service, idempotent `scripts/setup-cluster.sh` + `teardown.sh`. Verified: 2 replicas Running, API reachable via port-forward, clean setup→deploy→teardown.
 - **Phase 3 (API test suite): complete** — 11 integration tests against the deployed app (2 health, 6 CRUD, 3 resilience) using the kubernetes Python client + a `kubectl port-forward` subprocess. Full suite green: 20 passed (9 unit + 11 integration). Integration tests are marked `@pytest.mark.integration` and skip cleanly when no cluster is reachable.
-- **Next: Phase 4 (GitHub Actions CI)** — run unit tests on push; optionally spin up Kind and run integration tests in CI.
+- **Phase 4 (GitHub Actions CI): in progress** — `.github/workflows/k8s-tests.yaml` runs the full flow on push/PR to main: install kind v0.32.0, `bash scripts/setup-cluster.sh` (build → cluster → deploy → wait), then `pytest tests/ -v` (9 unit + 11 integration). Reuses the setup script as the single source of truth; dumps pod logs/describe/events on failure. Awaiting first green run on GitHub.
+- **Next: Phase 5 (Portfolio polish)** — README with architecture diagram, CI badge, run instructions.
 
 ## Layout
 
@@ -17,6 +18,7 @@ Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with 
 - `tests/` — `test_app.py` (Phase 1 unit tests via TestClient); Phase 3 integration tests `test_health.py`, `test_crud.py`, `test_resilience.py`; `conftest.py` (integration fixtures: `PortForward` subprocess, kube client fixtures, graceful skip); `requirements.txt` (adds kubernetes client)
 - `k8s/` — manifests: namespace, configmap, deployment, service
 - `scripts/` — `setup-cluster.sh`, `teardown.sh`
+- `.github/workflows/` — `k8s-tests.yaml` (Phase 4 CI: kind + full pytest suite on push/PR)
 - `conftest.py` (root) — puts repo root on `sys.path` so `import app.main` works; registers the `integration` marker
 
 ## Conventions
