@@ -10,7 +10,7 @@ Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with 
 - **Phase 2 (Kubernetes manifests): complete** — namespace/configmap/deployment/service, idempotent `scripts/setup-cluster.sh` + `teardown.sh`. Verified: 2 replicas Running, API reachable via port-forward, clean setup→deploy→teardown.
 - **Phase 3 (API test suite): complete** — 11 integration tests against the deployed app (2 health, 6 CRUD, 3 resilience) using the kubernetes Python client + a `kubectl port-forward` subprocess. Full suite green: 20 passed (9 unit + 11 integration). Integration tests are marked `@pytest.mark.integration` and skip cleanly when no cluster is reachable.
 - **Phase 4 (GitHub Actions CI): complete** — `.github/workflows/k8s-tests.yaml` runs the full flow on push/PR to main: install kind v0.32.0, `bash scripts/setup-cluster.sh` (build → cluster → deploy → wait), then `pytest tests/ -v` (9 unit + 11 integration). Reuses the setup script as the single source of truth; dumps pod logs/describe/events on failure. First run green: 20 passed in ~21s (run 31790344163). Remaining Phase 4 item — CI badge — deferred to Phase 5 (no README yet).
-- **Next: Phase 5 (Portfolio polish)** — README with architecture diagram, CI badge, run instructions.
+- **Phase 5 (Portfolio polish): complete** — `README.md` with CI badge, mermaid architecture diagram, run instructions (incl. Windows/Git Bash note), pasted `pytest -v` output (20 passed), CI overview, layout table, and links to the phase lessons docs. Code-clarity pass found nothing to change (app/Dockerfile already clean); `.gitignore` already covered. Only optional leftover: a local teardown→setup→tests repeat (CI already proves it green).
 
 ## Layout
 
