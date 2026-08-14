@@ -52,7 +52,7 @@ gh run watch <run-id> --exit-status        # follow a run live
 gh run view <run-id> --log                 # full logs (grep for "passed")
 ```
 
-Triggers (`on:` block): `push` and `pull_request`, both scoped to `branches: [main]`.
+Triggers (`on:` block): `push` and `pull_request`, both scoped to `branches: [main]` with `paths-ignore: ["**.md"]` — doc-only changes skip the (relatively expensive) Kind spin-up.
 
 ---
 
