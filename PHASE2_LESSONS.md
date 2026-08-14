@@ -50,9 +50,11 @@ Key ideas:
 
 Prerequisites: Docker running, `kind` and `kubectl` installed.
 
+**Windows: run this from Git Bash, not PowerShell** (see gotcha #4).
+
 ```bash
-# from repo root
-bash scripts/setup-cluster.sh          # create + deploy everything
+# from repo root (Git Bash)
+./scripts/setup-cluster.sh             # create + deploy everything
 
 # reach the API (leave this running in its own terminal)
 kubectl port-forward svc/qa-demo 8000:8000 -n qa-demo
@@ -225,7 +227,7 @@ Mirror image: check the cluster exists, then `kind delete cluster`. Also safe to
 
 ## 6. Gotchas we hit (the valuable part)
 
-These three cost real debugging time and are the reason the manifests/scripts look the way they do. All are recorded in `CLAUDE.md` too.
+These cost real debugging time and are the reason the manifests/scripts look the way they do. The first three are recorded in `CLAUDE.md` too.
 
 ### Gotcha 1 — Kind + cgroup v1 (the big one)
 **Symptom:** `kind create cluster` failed at `wait-control-plane` with `dial tcp ...:6443: connect: connection refused`. Retrying didn't help.
@@ -270,6 +272,24 @@ securityContext:
   runAsUser: 10001
 ```
 Caught this before deploying by reasoning about the security context — cheaper than a failed rollout.
+
+### Gotcha 4 — Windows: `bash` in PowerShell is WSL's bash, not Git Bash
+**Symptom:** running the script from PowerShell went nowhere in a few different ways:
+- `.\scripts\setup-cluster.sh` → **nothing happens** (PowerShell doesn't execute `.sh`; it hands the file to a default handler).
+- `bash .\scripts\setup-cluster.sh` → `/bin/bash: .scriptssetup-cluster.sh: No such file or directory` (bash strips the backslashes).
+- `bash scripts/setup-cluster.sh` → `line 19: kind: command not found` (script runs, but the tools aren't on this bash's PATH).
+
+**Root cause:** typing `bash` in PowerShell launches **WSL's** bash (`C:\Windows\System32\bash.exe`), which has its own Linux PATH. `kind`/`kubectl`/`docker` are installed on the **Windows** PATH — Git Bash inherits that, WSL bash does not. (WSL bash would also talk to a different Docker socket.)
+
+**Fix:** run the script from **Git Bash** with forward slashes:
+```bash
+./scripts/setup-cluster.sh
+```
+Or, to stay in PowerShell, invoke Git Bash explicitly instead of the WSL `bash`:
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" scripts/setup-cluster.sh
+```
+**Lesson:** on Windows, "command not found" for a tool you *know* is installed usually means the wrong shell — check *which* bash (`which kind` in Git Bash resolves; in WSL bash it won't). Always use Git Bash for this repo's scripts, and forward slashes for paths (bash treats `\` as an escape).
 
 ---
 
