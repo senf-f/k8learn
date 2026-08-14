@@ -2,7 +2,7 @@
 
 Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with pytest, automated with GitHub Actions. Portfolio project demonstrating deploy/test/automate skills from a QA automation perspective.
 
-**Full plan:** `LEARNING_PLAN.md` (5 phases + stretch goals). **Live progress:** `TODO.md`. **Design notes:** `PHASE1_LESSONS.md`, `PHASE2_LESSONS.md`, `PHASE3_LESSONS.md`, `PHASE4_LESSONS.md`.
+**Full plan:** `LEARNING_PLAN.md` (Phases 1–6 done; 7–11 are the former stretch goals, now numbered future phases). **Live progress:** `TODO.md`. **Design notes:** `PHASE1_LESSONS.md`, `PHASE2_LESSONS.md`, `PHASE3_LESSONS.md`, `PHASE4_LESSONS.md`.
 
 ## Current status
 
@@ -11,6 +11,8 @@ Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with 
 - **Phase 3 (API test suite): complete** — 11 integration tests against the deployed app (2 health, 6 CRUD, 3 resilience) using the kubernetes Python client + a `kubectl port-forward` subprocess. Full suite green: 20 passed (9 unit + 11 integration). Integration tests are marked `@pytest.mark.integration` and skip cleanly when no cluster is reachable.
 - **Phase 4 (GitHub Actions CI): complete** — `.github/workflows/k8s-tests.yaml` runs the full flow on push/PR to main: install kind v0.32.0, `bash scripts/setup-cluster.sh` (build → cluster → deploy → wait), then `pytest tests/ -v` (9 unit + 11 integration). Reuses the setup script as the single source of truth; dumps pod logs/describe/events on failure. First run green: 20 passed in ~21s (run 31790344163). Remaining Phase 4 item — CI badge — deferred to Phase 5 (no README yet).
 - **Phase 5 (Portfolio polish): complete** — `README.md` with CI badge, mermaid architecture diagram, run instructions (incl. Windows/Git Bash note), pasted `pytest -v` output (20 passed), CI overview, layout table, and links to the phase lessons docs. Code-clarity pass found nothing to change (app/Dockerfile already clean); `.gitignore` already covered. Only optional leftover: a local teardown→setup→tests repeat (CI already proves it green).
+- **Phase 6 (Test reporting): complete** — `pytest-html` generates a self-contained `report.html`; CI uploads it as the `pytest-report` artifact with `if: always()` (captured on failure too). `report.html` is git-ignored.
+- **Next: Phase 7 (Helm chart)** — see `LEARNING_PLAN.md`. Phases 7–11 are the former stretch goals; Phase 8 (second service) is the keystone for 10 (network policies) and 11 (ingress).
 
 ## Layout
 
