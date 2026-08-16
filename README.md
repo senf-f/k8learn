@@ -119,3 +119,4 @@ Each phase has a lessons doc capturing the *why* and the gotchas that shaped the
 - [`PHASE2_LESSONS.md`](PHASE2_LESSONS.md) — the manifests and setup scripts
 - [`PHASE3_LESSONS.md`](PHASE3_LESSONS.md) — integration & resilience testing against a live cluster
 - [`PHASE4_LESSONS.md`](PHASE4_LESSONS.md) — CI on an ephemeral cluster
+- [`PHASE7_LESSONS.md`](PHASE7_LESSONS.md) — packaging the manifests as a Helm chart

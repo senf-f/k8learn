@@ -2,7 +2,7 @@
 
 Kubernetes QA demo: a FastAPI test-case CRUD API, deployed to Kind, tested with pytest, automated with GitHub Actions. Portfolio project demonstrating deploy/test/automate skills from a QA automation perspective.
 
-**Full plan:** `LEARNING_PLAN.md` (Phases 1–7 done; 8–11 are the former stretch goals, now numbered future phases). **Live progress:** `TODO.md`. **Design notes:** `PHASE1_LESSONS.md`, `PHASE2_LESSONS.md`, `PHASE3_LESSONS.md`, `PHASE4_LESSONS.md`.
+**Full plan:** `LEARNING_PLAN.md` (Phases 1–7 done; 8–11 are the former stretch goals, now numbered future phases). **Live progress:** `TODO.md`. **Design notes:** `PHASE1_LESSONS.md`, `PHASE2_LESSONS.md`, `PHASE3_LESSONS.md`, `PHASE4_LESSONS.md`, `PHASE7_LESSONS.md`.
 
 ## Current status
 
