@@ -1,0 +1,7 @@
+{{ .Chart.Name }} deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+Reach the API (leave this running in its own terminal):
+
+  kubectl port-forward svc/{{ include "qa-demo.name" . }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+then hit http://127.0.0.1:{{ .Values.service.port }}/health

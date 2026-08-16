@@ -29,6 +29,9 @@ jobs:
           sudo mv ./kind /usr/local/bin/kind
           kind version
 
+      - name: Install Helm
+        uses: azure/setup-helm@v5
+
       # Docker and kubectl are preinstalled on ubuntu-latest runners.
       # setup-cluster.sh is the single source of truth for cluster bring-up:
       # it builds the image, creates the Kind cluster, loads the image, applies

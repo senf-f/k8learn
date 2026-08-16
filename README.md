@@ -32,11 +32,11 @@ Everything is wired by **labels and selectors** (`app: qa-demo`), not names: the
 
 ## Tech stack
 
-Python 3.12 · FastAPI · pytest · Docker · Kubernetes (Kind) · GitHub Actions
+Python 3.12 · FastAPI · pytest · Docker · Kubernetes (Kind) · Helm · GitHub Actions
 
 ## Run it locally
 
-**Prerequisites:** Docker running, plus `kind` and `kubectl` on your PATH.
+**Prerequisites:** Docker running, plus `kind`, `kubectl`, and `helm` on your PATH.
 
 > **Windows:** run the scripts from **Git Bash**, not PowerShell. Typing `bash` in PowerShell launches WSL's bash, which has a separate PATH (so `kind`/`kubectl` come back "command not found"). See `PHASE2_LESSONS.md` gotcha #4.
 
@@ -46,7 +46,7 @@ python -m venv .venv
 source .venv/Scripts/activate          # Windows Git Bash; use .venv/bin/activate on macOS/Linux
 pip install -r app/requirements.txt -r tests/requirements.txt
 
-# 2. build the image, create the cluster, deploy, wait for rollout
+# 2. build the image, create the cluster, deploy via Helm, wait for rollout
 bash scripts/setup-cluster.sh
 
 # 3. run the full suite (unit + integration against the live cluster)
@@ -98,7 +98,7 @@ tests/test_resilience.py::test_scale_to_zero_then_recover PASSED         [100%]
 
 ## Continuous integration
 
-`.github/workflows/k8s-tests.yaml` runs on every push/PR to `main`. Each run gets a **fresh, disposable cluster**: install `kind`, run `scripts/setup-cluster.sh` (the same script you run locally — one source of truth), then `pytest tests/ -v`. On failure it dumps pod status, `describe`, logs, and events so a red build is debuggable from the logs alone. Doc-only changes (`**.md`) are skipped.
+`.github/workflows/k8s-tests.yaml` runs on every push/PR to `main`. Each run gets a **fresh, disposable cluster**: install `kind` and `helm`, run `scripts/setup-cluster.sh` (the same script you run locally — one source of truth, deploys the Helm chart), then `pytest tests/ -v`. On failure it dumps pod status, `describe`, logs, and events so a red build is debuggable from the logs alone. Doc-only changes (`**.md`) are skipped.
 
 ## Project layout
 
@@ -106,7 +106,8 @@ tests/test_resilience.py::test_scale_to_zero_then_recover PASSED         [100%]
 |------|---------|
 | `app/` | FastAPI CRUD API (`main.py`), `requirements.txt`, `Dockerfile` (non-root, numeric UID) |
 | `tests/` | Unit tests (`test_app.py`) + integration tests (`test_health`, `test_crud`, `test_resilience`), `conftest.py` fixtures |
-| `k8s/` | Manifests: namespace, configmap, deployment, service |
+| `charts/qa-demo/` | Helm chart — templated Deployment, Service, ConfigMap + `values.yaml` (the deploy path) |
+| `archive/k8s-raw-manifests/` | The original Phase 2 raw manifests, kept as a learning reference (superseded by the chart) |
 | `scripts/` | `setup-cluster.sh`, `teardown.sh` |
 | `.github/workflows/` | `k8s-tests.yaml` — CI pipeline |
 

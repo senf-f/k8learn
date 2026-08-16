@@ -1,0 +1,6 @@
+apiVersion: v2
+name: qa-demo
+description: FastAPI test-case CRUD API for the k8s-qa-demo project
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,0 +1,40 @@
+replicaCount: 2
+
+image:
+  repository: k8s-qa-demo
+  tag: local
+  # Image is loaded into Kind with `kind load docker-image`, not pulled from a
+  # registry — IfNotPresent stops K8s trying (and failing) to pull.
+  pullPolicy: IfNotPresent
+
+# Injected into the container as environment variables via a ConfigMap.
+config:
+  APP_NAME: k8s-qa-demo
+  LOG_LEVEL: info
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+probes:
+  readiness:
+    initialDelaySeconds: 2
+    periodSeconds: 5
+  liveness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+# runAsUser matches the numeric UID baked into the Dockerfile. K8s runAsNonRoot
+# can only verify a non-root image user when it's numeric.
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  allowPrivilegeEscalation: false
